@@ -185,6 +185,9 @@ namespace Asteroids
             //Get some input
             UpdateInput();
 
+            //Update audioEngine
+            //audioEngine.Update();
+
             //Add velocity to the current position.
             ship.Position += ship.Velocity;
 
@@ -255,6 +258,9 @@ namespace Asteroids
 
         protected void UpdateInput()
         {
+            
+            
+
             //Get the game pad state
             GamePadState currentState = GamePad.GetState(PlayerIndex.One);
             if (currentState.IsConnected)
@@ -284,7 +290,8 @@ namespace Asteroids
             
 
             //In case you get lost, press B to warp back to the center
-            if (currentState.Buttons.B == ButtonState.Pressed && lastState.Buttons.B == ButtonState.Released)
+            if (currentState.Buttons.B == ButtonState.Pressed &&
+                    lastState.Buttons.B == ButtonState.Released)
             {
                 ship.Position = Vector3.Zero;
                 ship.Velocity = Vector3.Zero;
@@ -296,23 +303,24 @@ namespace Asteroids
             }
 
             //Shooting...?
-            if (ship.isActive && currentState.Buttons.A == ButtonState.Pressed && lastState.Buttons.A == ButtonState.Released)
+            if (ship.isActive && currentState.Buttons.A == ButtonState.Pressed &&
+                    lastState.Buttons.A == ButtonState.Released || Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                //Add another bullet. Find an inactive bullet slot and use it 
-                //If all bullet slots are used, ignore the user input
+                //add another bullet.  Find an inactive bullet slot and use it
+                //if all bullets slots are used, ignore the user input
                 for (int i = 0; i < GameConstants.NumBullets; i++)
                 {
                     if (!bulletList[i].isActive)
                     {
                         bulletList[i].direction = ship.RotationMatrix.Forward;
                         bulletList[i].speed = GameConstants.BulletSpeedAdjustment;
-                        bulletList[i].position = ship.Position + (200 * bulletList[i].direction);
+                        bulletList[i].position = ship.Position +
+                  (200 * bulletList[i].direction);
                         bulletList[i].isActive = true;
                         score -= GameConstants.ShotPenalty;
-                        soundBank.PlayCue("txt0_fire1");
+                        //soundBank.PlayCue("tx0_fire1");
 
-                        break; //exit the loop
-
+                        break; //exit the loop     
                     }
                 }
                 
@@ -356,8 +364,8 @@ namespace Asteroids
                         Matrix.CreateTranslation(bulletList[i].position);
                         DrawModel(bulletModel, bulletTransform, bulletTransforms);
                     }
-                
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.DrawString(lucidaConsole, "Score: " + score, scorePosition, Color.LightGreen);
             spriteBatch.End();
             base.Draw(gameTime);
